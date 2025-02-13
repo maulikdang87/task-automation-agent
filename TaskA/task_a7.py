@@ -8,7 +8,7 @@ def extract_email_sender():
     email_file = "./data/email.txt"
     output_file = "./data/email-sender.txt"
     api_url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
-    api_token = os.getenv("AIPROXY_TOKEN", "localhost:5432")
+    api_token = os.getenv("OPENAI_API_KEY", "localhost:5432")
     
     if not os.path.isfile(email_file):
         raise FileNotFoundError("Email file not found")

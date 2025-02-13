@@ -1,34 +1,38 @@
+import os
 import subprocess
 
-
-def is_npm_installed():
+def is_npx_installed():
     try:
-        subprocess.run(["npm", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(
+            ["npx", "--version"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        print("npx version:", result.stdout.strip())
         return True
-    except FileNotFoundError:
+    except (FileNotFoundError, subprocess.CalledProcessError):
         return False
-
-def is_prettier_installed():
-    try:
-        subprocess.run(["prettier", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return True
-    except FileNotFoundError:
-        return False
-
-def install_prettier():
-    if not is_npm_installed():
-        raise RuntimeError("npm is not installed. Please install npm first.")
-    try:
-        subprocess.run(["npm", "install", "-g", "prettier@3.4.2"], check=True)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to install Prettier: {e}")
 
 def format_markdown():
-    file_path = "./data/format.md"
-    if not is_prettier_installed():
-        install_prettier()
+    file_path = "data/format.md"
+    if not os.path.isfile(file_path):
+        raise RuntimeError(f"File '{file_path}' not found.")
+    
+    if not is_npx_installed():
+        raise RuntimeError("npx is not installed. Please install npm (npx is bundled with npm).")
+    
     try:
-        subprocess.run(["prettier", "--write", file_path], check=True)
+        result = subprocess.run(
+            ["npx", "prettier@3.4.2", "--parser", "markdown", "--stdin-filepath", file_path],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        print("npx prettier output:", result.stdout)
         return "Markdown formatting completed successfully."
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to format markdown: {e}")
+        raise RuntimeError(f"Failed to format markdown: {e.stderr}")
+

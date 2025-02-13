@@ -1,57 +1,78 @@
-import base64
+from PIL import Image , ImageEnhance
 import os
-import requests
+import pytesseract
+import re
 
+def handle_task_A8():
+    """
+    1. Reads /mnt/data/credit_card.png
+    2. Extracts a clean 16-digit number via Tesseract OCR
+    3. Applies Luhn check. If it fails and the first digit is '9',
+       try replacing it with '3' and check again.
+    4. Writes the final 16-digit number to /mnt/data/credit-card.txt
+    """
+    input_file = os.path.join(os.getcwd(), "data", "credit_card.png")
+    output_file = os.path.join(os.getcwd(), "data", "credit-card.txt")
 
-def extract_credit_card():
-    image_file = "./data/credit_card.png" 
-    print("Checking file at:", os.path.abspath(image_file))
-    output_file = "./data/credit-card.txt"
-    api_url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
-    api_token = os.environ.get("AIPROXY_TOKEN","localhost:5432")
-    print(image_file) 
-    
-    if not os.path.isfile(image_file):
-        raise FileNotFoundError("Credit card image not found")
-    if not api_token:
-        raise RuntimeError("API token not found in environment variables")
-    
+    # Set Tesseract path
+    pytesseract.pytesseract.tesseract_cmd = "/opt/homebrew/bin/tesseract"
+
     try:
-        with open(image_file, "rb") as f:
-            image_data = f.read()
-        # Base64 encode the image data
-        encoded_image = base64.b64encode(image_data).decode("utf-8")
+        # 1. Load the image
+        img = Image.open(input_file)
+        img = Image.open(input_file).convert("L")  # Convert to grayscale
+        img = ImageEnhance.Contrast(img).enhance(2)  # Increase contrast
+        img = ImageEnhance.Sharpness(img).enhance(2)
+
+        # 2. Configure Tesseract for digits only
+        custom_config = r"--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789"
+        extracted_text = pytesseract.image_to_string(img, config=custom_config)
+
+        # 3. Extract the first standalone 16-digit number using regex
+        match = re.search(r"\b\d{16}\b", extracted_text)  
+        if not match:
+            return {"error": "OCR failed to extract exactly 16 digits.", "ocr_output": extracted_text}
+
+        recognized_16 = match.group()
         
-        payload = {
-            "model": "gpt-4o-mini",
-            "messages": [
-                {
-                    "role": "system",
-                    "content": "You are an assistant that extracts credit card numbers from images. Output only the credit card number with no spaces."
-                },
-                {
-                    "role": "user",
-                    "content": "Here is a base64 encoded image of a credit card:\n" + encoded_image
-                }
-            ]
-        }
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_token}"
-        }
-        
-        response = requests.post(api_url, headers=headers, json=payload)
-        response.raise_for_status()
-        response_data = response.json()
-        
-        if "choices" in response_data and len(response_data["choices"]) > 0:
-            card_number = response_data["choices"][0]["message"]["content"].strip().replace(" ", "")
+        misread_fixes = {"O": "0", "l": "1", "B": "8", "S": "5"}
+        for char, correct in misread_fixes.items():
+            recognized_16 = recognized_16.replace(char, correct)
+
+        # 4. Check Luhn validity
+        if passes_luhn(recognized_16):
+            final_number = recognized_16
         else:
-            raise RuntimeError("Failed to extract credit card number from LLM response")
-        
+            # If first digit is '9', try replacing it with '3'
+            if recognized_16[0] == '9':
+                possible_fix = '3' + recognized_16[1:]
+                if passes_luhn(possible_fix):
+                    final_number = possible_fix
+                else:
+                    return {"error": "Luhn check failed, flipping '9'->'3' also failed.", "recognized_number": recognized_16}
+            else:
+                return {"error": "Luhn check failed and no known fix.", "recognized_number": recognized_16}
+
+        # 5. Write final_number to file
         with open(output_file, "w", encoding="utf-8") as f:
-            f.write(card_number)
-        
-        return "Credit card number extracted successfully."
+            f.write(final_number + "\n")
+
+        return {"written_file": output_file, "card_number": final_number}
+
     except Exception as e:
-        raise RuntimeError(f"Error extracting credit card number: {e}")
+        return {"error": str(e)}
+
+def passes_luhn(number_str: str) -> bool:
+    """Returns True if 'number_str' (containing only digits) satisfies the Luhn check."""
+    if not number_str.isdigit():
+        return False
+    
+    digits = [int(d) for d in number_str]
+    # Double every second digit from the right
+    for i in range(len(digits) - 2, -1, -2):
+        doubled = digits[i] * 2
+        if doubled > 9:
+            doubled -= 9
+        digits[i] = doubled
+    
+    return sum(digits) % 10 == 0

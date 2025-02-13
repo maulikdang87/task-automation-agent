@@ -20,7 +20,7 @@ import time
 from PIL import Image, ImageDraw, ImageFont
 from faker import Faker
 
-config = {"root": "./data"}
+config = {"root": "/Users/maulikdang/Developer/iitm/tds/dataworks_agent/my_agent/data"}
 
 
 def num(str):
@@ -276,7 +276,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("email")
-    parser.add_argument("--root", default="./data")
+    parser.add_argument("--root", default="/Users/maulikdang/Developer/iitm/tds/dataworks_agent/my_agent/data")
     args = parser.parse_args()
     config["email"] = args.email
     config["root"] = os.path.abspath(args.root)
