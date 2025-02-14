@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import requests
 import numpy as np
 
-def find_similar_comments():
+def A9():
     """
     Reads comments from './data/comments.txt', obtains embeddings for all comments via the LLM embeddings API,
     computes cosine similarities between each pair, and writes the most similar pair to './data/comments-similar.txt'.

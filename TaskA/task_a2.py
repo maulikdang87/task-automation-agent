@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-def handle_task_A2():
+def A2():
     """
     Formats the file /data/format.md using prettier@3.4.2.
     The file is updated in-place.
@@ -35,7 +35,7 @@ def handle_task_A2():
             capture_output=True,
             text=True,
             check=True,
-            shell=True,  # Command is provided as a string.
+            # shell=True,  # Command is provided as a string.
             cwd=os.getcwd(),         # Ensure we run in the project root.
             env=os.environ.copy()      # Pass the current environment.
         )

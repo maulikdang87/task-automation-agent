@@ -3,7 +3,7 @@ import os
 import pytesseract
 import re
 
-def handle_task_A8():
+def A8():
     """
     1. Reads /mnt/data/credit_card.png
     2. Extracts a clean 16-digit number via Tesseract OCR

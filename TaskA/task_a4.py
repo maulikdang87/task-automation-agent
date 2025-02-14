@@ -1,7 +1,7 @@
 import json
 import os
 
-def handle_task_A4():
+def A4():
     """
     Sorts the array of contacts in /data/contacts.json by last_name, then first_name,
     and writes the result to /data/contacts-sorted.json.

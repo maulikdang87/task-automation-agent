@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-def handle_task_A3():
+def A3():
     """
     Reads data/dates.txt, counts the number of Wednesdays,
     and writes the count to data/dates-wednesdays.txt.

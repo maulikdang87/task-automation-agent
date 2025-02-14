@@ -1,7 +1,7 @@
 import os
 import sqlite3
 
-def compute_gold_ticket_sales():
+def A10():
     db_file = "./data/ticket-sales.db"
     output_file = "./data/ticket-sales-gold.txt"
     

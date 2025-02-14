@@ -3,7 +3,7 @@ import requests
 import shutil 
 import subprocess
 import os
-def handle_task_A1(user_email: str):
+def A1(user_email: str ,script_url : str):
     # 1. Check if 'uv' is installed.
     if shutil.which("uv") is None:
         try:

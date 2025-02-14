@@ -2,7 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 
-def extract_email_sender():
+def A7():
     load_dotenv()
     
     email_file = "./data/email.txt"

@@ -2,7 +2,7 @@ import json
 import os
 import re
 
-def handle_task_A6():
+def A6():
     """
     Find all .md files in /data/docs/, extract the first occurrence of an H1 title (# Title),
     and save them in /data/docs/index.json as { "file.md": "Title", ... }.

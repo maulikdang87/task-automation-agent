@@ -1,7 +1,7 @@
 import os
 
 
-def get_most_recent_logs():
+def A5():
     log_dir = "./data/logs"
     output_file = "./data/logs-recent.txt"
     
