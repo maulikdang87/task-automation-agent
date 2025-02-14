@@ -8,24 +8,33 @@
 from fastapi.responses import PlainTextResponse
 from TaskA.task_a1 import handle_task_A1
 from TaskA.task_a2 import handle_task_A2
-# from TaskA.task_a3 import handle_task_A3
-# from TaskA.task_a4 import handle_task_A4
-# from TaskA.task_a5 import get_most_recent_logs
-# from TaskA.task_a6 import handle_task_A6
-# from TaskA.task_a7 import extract_email_sender
-# from TaskA.task_a8 import handle_task_A8
-# from TaskA.task_a9 import find_similar_comments
-# from TaskA.task_a10 import compute_gold_ticket_sales
+from TaskA.task_a3 import handle_task_A3
+from TaskA.task_a4 import handle_task_A4
+from TaskA.task_a5 import get_most_recent_logs
+from TaskA.task_a6 import handle_task_A6
+from TaskA.task_a7 import extract_email_sender
+from TaskA.task_a8 import handle_task_A8
+from TaskA.task_a9 import find_similar_comments
+from TaskA.task_a10 import compute_gold_ticket_sales
 from fastapi import FastAPI, Query, HTTPException
 import uvicorn
 import os
 from dotenv import load_dotenv
 from aTaskassigner import determine_task
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 # Assume determine_task and all the task functions (run_datagen, handle_task_A2, etc.)
 # are defined as in the previous code.
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 @app.post("/run")
 async def run_task(task: str = Query(..., description="Task description in plain English")):
@@ -43,22 +52,22 @@ async def run_task(task: str = Query(..., description="Task description in plain
             result = handle_task_A1(user_email)
         elif determined_task == "A2":
             result = handle_task_A2() 
-        # elif determined_task == "A3":
-        #     result = handle_task_A3()
-        # elif determined_task == "A4":
-        #     result = handle_task_A4()
-        # elif determined_task == "A5":
-        #     result = get_most_recent_logs()
-        # elif determined_task == "A6":
-        #     result = handle_task_A6()
-        # elif determined_task == "A7":
-        #     result = extract_email_sender()
-        # elif determined_task == "A8":
-        #     result = handle_task_A8()
-        # elif determined_task == "A9":
-        #     result = find_similar_comments()
-        # elif determined_task == "A10":
-        #     result = compute_gold_ticket_sales()
+        elif determined_task == "A3":
+            result = handle_task_A3()
+        elif determined_task == "A4":
+            result = handle_task_A4()
+        elif determined_task == "A5":
+            result = get_most_recent_logs()
+        elif determined_task == "A6":
+            result = handle_task_A6()
+        elif determined_task == "A7":
+            result = extract_email_sender()
+        elif determined_task == "A8":
+            result = handle_task_A8()
+        elif determined_task == "A9":
+            result = find_similar_comments()
+        elif determined_task == "A10":
+            result = compute_gold_ticket_sales()
         else:
             # If LLM returned UNKNOWN or an unsupported task code.
             raise Exception("Unrecognized or unsupported task code returned by LLM.")
