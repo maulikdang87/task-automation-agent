@@ -47,7 +47,7 @@ def handle_task_A3():
             # datetime.weekday() returns Monday=0, Tuesday=1, Wednesday=2, etc.
             if parsed_date.weekday() == 2:
                 wednesday_count += 1
-    print(wednesday_count);
+
 
     # Write just the count to the output file.
     with open(output_file, "w") as file:

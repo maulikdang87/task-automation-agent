@@ -63,7 +63,6 @@ def determine_task(task_description: str):
     response = requests.post(api_url, headers=headers, json=payload)
     response.raise_for_status()
     response_data = response.json()
-    print("LLM response data:", response_data)
     
     if "choices" in response_data and len(response_data["choices"]) > 0:
         raw_content = response_data["choices"][0]["message"]["content"].strip()

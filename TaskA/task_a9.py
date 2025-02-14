@@ -49,8 +49,6 @@ def find_similar_comments():
 
         response.raise_for_status()  # Raise an exception for HTTP errors
         response_data = response.json()
-
-        
         # Extract embeddings as numpy arrays
         embeddings = [np.array(item["embedding"]) for item in response_data["data"]]
         n = len(embeddings)
@@ -68,6 +66,7 @@ def find_similar_comments():
                 if sim > max_score:
                     max_score = sim
                     max_pair = (i, j)
+                    
         
         if max_pair[0] is None or max_pair[1] is None:
             raise RuntimeError("Failed to find similar comments")
